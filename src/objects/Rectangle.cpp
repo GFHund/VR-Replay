@@ -1,5 +1,5 @@
 #include "Rectangle.h"
-#include "Exceptions/IndexOutOfBoundsException.h"
+
 /*
 { -1.0f, -1.0f,  1.f, 0.0f, 0.f,  0.f,1.f },
 {  1.0f, -1.0f,  0.f, 0.5f, 0.f,  1.f,1.f },
@@ -15,15 +15,22 @@ Rectangle::Rectangle(){
 }
 
 Rectangle::~Rectangle(){
-    delete mModel;
+    if(mModel != nullptr){
+        delete[] mModel;
+    }
+    if(mIndexdata != nullptr){
+        delete[] mIndexdata;
+    }
+    
 }
 
 ModelData* Rectangle::getModelData(unsigned int& size){
+    size = 6;
     if(mModel != nullptr){
         return mModel;
     }
     ModelData* model= new ModelData[6];
-    size = 6;
+    
     model[0] = ModelData();
     model[0].x = -1.0f;
     model[0].y = -1.0f;
@@ -71,23 +78,24 @@ ModelData* Rectangle::getModelData(unsigned int& size){
     return model;
 }
 
-Image* Rectangle::getImage(unsigned int index){
-    if(index > 1){
-        throw IndexOutOfBoundsException();
+
+unsigned short* Rectangle::getIndexData(unsigned int& size){
+    size = 6;
+    if(mIndexdata != nullptr){
+        return mIndexdata;
     }
-    /*I don't know at the moment if the images[index] is no defined. The result may be undefined*/
-    return this->images[index];
-}
-void Rectangle::setImage(unsigned int index,Image* image){
-    if(index > 1){
-        throw IndexOutOfBoundsException();
-    }
-    this->images[index] = image;
+    unsigned short* indexData = new unsigned short[6];
+
+    indexData[0] = 0;
+    indexData[1] = 1;
+    indexData[2] = 2;
+    indexData[3] = 3;
+    indexData[4] = 4;
+    indexData[5] = 5;
+
+    mIndexdata = indexData;
+
+    return indexData;
 }
 
-Shader* Rectangle::getShader(){
-    return this->shader;
-}
-void Rectangle::setShader(Shader* shader){
-    this->shader = shader;
-}
+

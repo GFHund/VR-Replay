@@ -1,13 +1,15 @@
 #ifndef __IMAGE__
 #define __IMAGE__
 #include <array>
+#include <string>
 #include "pixelFormat/AbstractPixelFormat.h"
-#include "pixelFormat/RGB.h"
+#include "pixelFormat/RGBA.h"
+#include "Font.h"
 
 
 class Image{
     private: 
-        RGB* mPixels;
+        RGBA* mPixels;
         unsigned int mWidth;
         unsigned int mHeight;
         unsigned int glTexId;
@@ -17,58 +19,27 @@ class Image{
         PX_RGB,
         PX_Grey
     };
-    Image(unsigned int width,unsigned int height){
-        this->mHeight = height;
-        this->mWidth = width;
-        
-        mPixels = new RGB[width*height];
-        
-    }
-    ~Image(){
-        /*
-        for(int i=0;i<mWidth*mHeight;i++){
-            delete mPixels[i];
-        }
-        */
-        delete[] mPixels;
-    }
+    Image(unsigned int width,unsigned int height);
+    ~Image();
 
-    unsigned int getWidth(){
-        return this->mWidth;
-    }
-    unsigned int getHeight(){
-        return this->mHeight;
-    }
-    unsigned char* getPixels(){
-        return (unsigned char*)this->mPixels;
-    }
+    unsigned int getWidth();
+    unsigned int getHeight();
+    unsigned char* getPixels();
 
-    void setPixel(unsigned int x,unsigned int y,unsigned int r,unsigned int g,unsigned int b){
-        RGB pixel = RGB();
-        pixel.r = r;
-        pixel.g = g;
-        pixel.b = b;
-        int index = y*mWidth +x;
-        if(index > mWidth*mHeight) return;
-        this->mPixels[index] = pixel;
-    }
+    void setPixel(unsigned int x,unsigned int y,unsigned char r,unsigned char g,unsigned char b,unsigned char a);
 
-    unsigned int getGlTexId(){
-        return this->glTexId;
-    }
-    void setGlTexId(unsigned int glTexId){
-        this->glTexId = glTexId;
-    }
+    unsigned int getGlTexId();
+    void setGlTexId(unsigned int glTexId);
 
-    static Image* getDefaultImage(unsigned int width,unsigned int height,unsigned int r,unsigned int g,unsigned int b){
-        Image* img = new Image(512,512);
-        for(int i=0; i < width;i++){
-            for(int k=0;k < height;k++){
-                img->setPixel(i,k,r,g,b);
-            }        
-        }
-        return img;
-    }
+    static Image* getDefaultImage(
+        unsigned int width,
+        unsigned int height,
+        unsigned char r,
+        unsigned char g,
+        unsigned char b, 
+        unsigned char a);
+
+    static Image* getImageFromText(std::string text,Font font);
 };
 
 #endif

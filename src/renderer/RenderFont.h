@@ -1,8 +1,8 @@
 #ifndef __RENDER_FONT__
 #define __RENDER_FONT__
 
-#include "Image.h"
-#include "pixelFormat/RGB.h"
+#include "../Image.h"
+#include "../pixelFormat/RGBA.h"
 #include <string>
 
 #include <ft2build.h>
@@ -10,8 +10,8 @@
 
 class RenderFont{
 private:
-    RGB fontColor;
-    RGB bgColor;
+    RGBA fontColor;
+    RGBA bgColor;
 
     FT_Library library;
     FT_Face face;
@@ -21,8 +21,8 @@ public:
 
     void init();
 
-    void setFontColor(unsigned char r,unsigned char g, unsigned char b);
-    void setBgColor(unsigned char r,unsigned char g, unsigned char b);
+    void setFontColor(unsigned char r,unsigned char g, unsigned char b,unsigned char a);
+    void setBgColor(unsigned char r,unsigned char g, unsigned char b,unsigned char a);
     void setFontFamily(std::string fontfile);
     void setFontSize(unsigned int size);
 

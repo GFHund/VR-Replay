@@ -10,8 +10,6 @@ class Abstract3dObject{
     virtual ModelData* getModelData(unsigned int& size) = 0;
     virtual Image* getImage(unsigned int index) = 0;
     virtual Shader* getShader() = 0;
-    virtual void setVertexBuffer(int vertexBuffer) = 0;
-    virtual int getVertexBuffer() = 0;
 };
 
 #endif

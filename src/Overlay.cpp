@@ -4,13 +4,15 @@
 #include <stdio.h>
 #include <cstdint>
 #include <iostream>
-#include "Renderer.h"
-#include "Rectangle.h"
-#include "Exceptions/ShaderReadFailureException.h"
+#include "renderer/Renderer.h"
+#include "objects/Rectangle.h"
+
 #include "Exceptions/InitFontException.h"
 #include "Exceptions/LoadingFontException.h"
 #include "Exceptions/SetFontSizeException.h"
-#include "RenderFont.h"
+
+#include "stateMachine/StateMachine.h"
+#include "stateMachine/LastLapTimeState.h"
 
 
 static void error_callback(int error, const char* description)
@@ -46,19 +48,42 @@ void Overlay::init(){
     glfwSetKeyCallback(window, key_callback);
     glfwMakeContextCurrent(window);
 
-    Rectangle rect = Rectangle();
-    Image* img = new Image(512,512);
-    for(int i=0; i< 512;i++){
-        for(int k=0;k<512;k++){
-            img->setPixel(i,k,200,200,200);
-        }
-        
+    StateMachine sm;
+    LastLapTimeState* llts = new LastLapTimeState();
+    sm.addState("LastLapTime",llts);
+    sm.setStartState("LastLapTime");
+
+    Renderer renderObj;
+    renderObj.init(640,480);
+    sm.init(renderObj);
+
+
+    while (!glfwWindowShouldClose(window))
+    {
+        glfwGetFramebufferSize(window, &width, &height);
+
+        //renderObj.render3DObject(&rect);
+        sm.loop(renderObj);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
+
+    glfwDestroyWindow(window);
+
+    glfwTerminate();
+
+    sm.finish(renderObj);
+}
+/*
+Rectangle rect = Rectangle();
+    
     //rect.setImage(0,img);
     
     RenderFont font;
     try{
         font.init();
+        font.setBgColor(0,0,0,100);
         Image* fontImg = font.renderFont("Hallo Welt, Oh du schöne Welt");
         rect.setImage(0,fontImg);
     }
@@ -91,17 +116,4 @@ void Overlay::init(){
     renderObj.init(640,480);
     renderObj.init3DObject(&rect);
 
-    while (!glfwWindowShouldClose(window))
-    {
-        glfwGetFramebufferSize(window, &width, &height);
-
-        renderObj.render3DObject(&rect);
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    glfwDestroyWindow(window);
-
-  glfwTerminate();
-}
+*/

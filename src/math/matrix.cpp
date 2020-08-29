@@ -1,0 +1,152 @@
+#include "matrix.h"
+
+namespace dogEngine
+{
+	CMatrix2::CMatrix2()
+	:CSquareMatrix()
+	{
+	}
+
+	//CMatrix2::CMatrix2(bool column,float* arr)
+	CMatrix2::CMatrix2(bool column,std::array<float,4> arr)
+	: CSquareMatrix(column,arr)
+	{
+	}
+
+	CMatrix2::CMatrix2(CMatrix<2u,2u> mat)
+	{
+		for(int i = 0;i<getColumnNum();i++)
+		{
+			for(int k =0;k<getRowNum();k++)
+			{
+				setEntity(i,k,mat.getEntity(i,k));
+			}
+		}
+	}
+
+	CMatrix2 CMatrix2::inverse()
+	{
+		CMatrix2 ret;
+		float det = 1.0f/determinant();
+		ret.setEntity(0,0,getEntity(1,1));
+		ret.setEntity(1,0,-getEntity(1,0));
+		ret.setEntity(0,1,-getEntity(0,1));
+		ret.setEntity(1,1,getEntity(0,0));
+		ret = ret * det;
+		return ret;
+	}
+
+	float CMatrix2::determinant()
+	{
+		return getEntity(0,0)*getEntity(1,1) - getEntity(1,0) * getEntity(0,1);
+	}
+
+	//-------------------------------------
+
+	CMatrix3::CMatrix3()
+	: CSquareMatrix()
+	{
+	}
+
+	//CMatrix3::CMatrix3(bool column,float* arr)
+	CMatrix3::CMatrix3(bool column,std::array<float,9> arr)
+	: CSquareMatrix(column,arr)
+	{
+	}
+
+	CMatrix3::CMatrix3(CMatrix<3u,3u> mat)
+	{
+		for(int i = 0;i<getColumnNum();i++)
+		{
+			for(int k =0;k<getRowNum();k++)
+			{
+				setEntity(i,k,mat.getEntity(i,k));
+			}
+		}
+	}
+
+	CMatrix3 CMatrix3::inverse()
+	{
+		//float A,B,C,D,E,F,G,H,I;
+		float det = 1.0f/determinant();
+		CMatrix3 ret;
+		ret.setEntity(0,0,getEntity(1,1)*getEntity(2,2)-getEntity(2,1)*getEntity(1,2));
+		ret.setEntity(1,0,-(getEntity(0,1)*getEntity(2,2)-getEntity(2,1)*getEntity(0,2)));
+		ret.setEntity(2,0,(getEntity(0,1)*getEntity(1,2)-getEntity(1,1)*getEntity(0,2)));
+
+		ret.setEntity(0,1,-(getEntity(1,0)*getEntity(2,2) - getEntity(2,0)*getEntity(1,2)));
+		ret.setEntity(1,1,getEntity(0,0)*getEntity(2,2) - getEntity(2,0)*getEntity(0,2));
+		ret.setEntity(2,1,-(getEntity(0,0)*getEntity(1,2) - getEntity(1,0)*getEntity(0,2)));
+
+		ret.setEntity(0,2,getEntity(1,0)*getEntity(2,1) - getEntity(2,0)*getEntity(1,1));
+		ret.setEntity(1,2,-(getEntity(0,0)*getEntity(2,1) - getEntity(2,0)*getEntity(0,1)));
+		ret.setEntity(2,2,getEntity(0,0)*getEntity(1,1) - getEntity(1,0)*getEntity(0,1));
+
+		ret = ret.transpose();
+		ret = ret*det;
+		return ret;
+	}
+	float CMatrix3::determinant()
+	{
+		return getEntity(0,0)*getEntity(1,1)*getEntity(2,2)+
+				getEntity(1,0)*getEntity(2,1)*getEntity(0,2)+
+				getEntity(2,1)*getEntity(0,1)*getEntity(1,2)-
+				getEntity(2,0)*getEntity(1,1)*getEntity(0,2)-
+				getEntity(1,0)*getEntity(0,1)*getEntity(2,2)-
+				getEntity(0,0)*getEntity(2,1)*getEntity(1,2);
+	}
+	//-------------------------------------
+	CMatrix4::CMatrix4()
+	: CSquareMatrix()
+	{
+	}
+
+	//CMatrix4::CMatrix4(bool column,float* arr)
+	CMatrix4::CMatrix4(bool column,std::array<float,16> arr)
+	: CSquareMatrix(column,arr)
+	{
+	}
+
+	CMatrix4::CMatrix4(CMatrix<4u,4u> mat)
+	{
+		for(int i = 0;i<getColumnNum();i++)
+		{
+			for(int k =0;k<getRowNum();k++)
+			{
+				setEntity(i,k,mat.getEntity(i,k));
+			}
+		}
+	}
+
+	CVector3 CMatrix4::multiplyVec3(CVector3 vec)
+	{
+		CVector4 vec4 = CVector4(vec);
+		CMatrix4 mat = (*this);
+		CVector4 ret4 =  mat * vec4;
+		return CVector3(ret4.getX(),ret4.getY(),ret4.getZ());
+	}
+
+	CMatrix3 CMatrix4::getRotationMatrix()
+	{
+		CMatrix3 ret;
+		ret.setEntity(0,0,getEntity(0,0));
+		ret.setEntity(0,1,getEntity(0,1));
+		ret.setEntity(0,2,getEntity(0,2));
+
+		ret.setEntity(1,0,getEntity(1,0));
+		ret.setEntity(1,1,getEntity(1,1));
+		ret.setEntity(1,2,getEntity(1,2));
+
+		ret.setEntity(2,0,getEntity(2,0));
+		ret.setEntity(2,1,getEntity(2,1));
+		ret.setEntity(2,2,getEntity(2,2));
+
+		return ret;
+	}
+	/*
+	CMatrix4 CMatrix4::getTranslationMatrix(CVector3 vec)
+	{
+
+	}
+	*/
+}

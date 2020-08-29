@@ -1,7 +1,7 @@
 #include "RenderFont.h"
-#include "Exceptions/InitFontException.h"
-#include "Exceptions/LoadingFontException.h"
-#include "Exceptions/SetFontSizeException.h"
+#include "../Exceptions/InitFontException.h"
+#include "../Exceptions/LoadingFontException.h"
+#include "../Exceptions/SetFontSizeException.h"
 #include <math.h>
 #include <iostream>
 
@@ -16,8 +16,8 @@ void RenderFont::init(){
     if(error){
         throw InitFontException("Fehler beim initialisieren von FreeType");
     }
-    setBgColor(0,0,0);
-    setFontColor(255,255,255);
+    setBgColor(0,0,0,255);
+    setFontColor(255,255,255,255);
     std::cout << "Load Font"<< std::endl;
     setFontFamily("Dosis-Medium.ttf");
     std::cout << "set Font size"<< std::endl;
@@ -40,15 +40,17 @@ void RenderFont::setFontFamily(std::string fontfile){
     }
 }
 
-void RenderFont::setFontColor(unsigned char r,unsigned char g, unsigned char b){
+void RenderFont::setFontColor(unsigned char r,unsigned char g, unsigned char b,unsigned char a){
     this->fontColor.r = r;
     this->fontColor.g = g;
     this->fontColor.b = b;
+    this->fontColor.a = a;
 }
-void RenderFont::setBgColor(unsigned char r,unsigned char g, unsigned char b){
+void RenderFont::setBgColor(unsigned char r,unsigned char g, unsigned char b,unsigned char a){
     this->bgColor.r = r;
     this->bgColor.g = g;
     this->bgColor.b = b;
+    this->bgColor.a = a;
 }
 void RenderFont::setFontSize(unsigned int size){
     FT_Error error = FT_Set_Char_Size(face,50 * 64,0,100,0);
@@ -65,7 +67,7 @@ Image* RenderFont::renderFont(std::string text){
 
     std::cout << "init Default Image" << std::endl;
 
-    Image* img = Image::getDefaultImage(width,height,this->bgColor.r,this->bgColor.g,this->bgColor.b);
+    Image* img = Image::getDefaultImage(width,height,this->bgColor.r,this->bgColor.g,this->bgColor.b, this->bgColor.a);
     
     
     FT_GlyphSlot slot;
@@ -107,10 +109,11 @@ std::cout << "go Thorught text" << std::endl;
                 int index2 = q* bitmap->width +p;
                 unsigned char bufferVal = bitmap->buffer[index2];
                 if(bufferVal > 0){
-                    unsigned char r = bufferVal;
-                    unsigned char g = bufferVal;
-                    unsigned char b = bufferVal;
-                    img->setPixel(k,j,r,g,b);
+                    unsigned char r = this->fontColor.r;
+                    unsigned char g = this->fontColor.g;
+                    unsigned char b = this->fontColor.b;
+                    unsigned char a = this->fontColor.a;
+                    img->setPixel(k,j,r,g,b, a);
                 }
                 
                 //image[index] = bitmap->buffer[index2];

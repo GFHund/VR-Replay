@@ -39,10 +39,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCES src/main.cpp
     src/Overlay.cpp
-    src/Renderer.cpp
     src/Shader.cpp
-    src/Rectangle.cpp
-    src/RenderFont.cpp)
+    src/Image.cpp
+    src/Exceptions/normalizeZeroVectorException.cpp
+    src/renderer/Renderer.cpp
+    src/renderer/RenderFont.cpp
+    src/objects/Rectangle.cpp
+    src/objects/Ring.cpp
+    src/math/vector.cpp
+    src/math/matrix.cpp
+    src/math/quaternion.cpp
+    src/stateMachine/StateMachine.cpp
+    src/stateMachine/LastLapTimeState.cpp)
 
 add_executable(S5HOverlay ${SOURCES})
 
