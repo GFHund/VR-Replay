@@ -149,4 +149,17 @@ namespace dogEngine
 
 	}
 	*/
+	CMatrix4 CMatrix4::getOrtho(float left,float right,float bottom,float top,float zNear,float zFar){
+		float xx = 2/(right - left);
+			float yy = 2/(top - bottom);
+			float zz = -2/(zFar - zNear);
+			float wx = -(right + left)/(right - left);
+			float wy = -(top + bottom)/(top - bottom);
+			float wz = -(zFar - zNear)/(zFar - zNear);
+			std::array<float,16> orthoMatrixArr = {xx,0,0,wx,
+											0,yy,0,wy,
+											0,0,zz,wz,
+											0,0,0,1};
+		return CMatrix4(false,orthoMatrixArr);
+	}
 }

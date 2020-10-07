@@ -1,6 +1,6 @@
-#include "Overlay.h"
+#include "F1Replay.h"
 
 int main(){
-    Overlay o = Overlay();
+    F1Replay o = F1Replay();
     o.init();
 }

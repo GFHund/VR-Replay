@@ -18,8 +18,8 @@ private:
     ~Ring();
     ModelData* getModelData(unsigned int& size);
     unsigned short* getIndexData(unsigned int& size);
-    Image* getImage(unsigned int index);
-    Shader* getShader();
+    //Image* getImage(unsigned int index);
+    //Shader* getShader();
     void setVertexBuffer(int vertexBuffer);
     int getVertexBuffer();
 };

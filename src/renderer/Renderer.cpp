@@ -5,21 +5,21 @@
 #include "../linmath.h"
 
 void Renderer::init(int width,int height){
-    //---------------------- GLEW Commands
-    std::cout << "GLEW Init" << std::endl;
-    glewExperimental = GL_TRUE;
-    GLenum err = glewInit();
-    if (GLEW_OK != err)
-    {
-        std::cout << glewGetErrorString(err);
-        return;
-        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-    }
-    mWidth = width;
-    mHeight = height;
+  //---------------------- GLEW Commands
+  std::cout << "GLEW Init" << std::endl;
+  glewExperimental = GL_TRUE;
+  GLenum err = glewInit();
+  if (GLEW_OK != err)
+  {
+      std::cout << glewGetErrorString(err);
+      return;
+      fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+  }
+  mWidth = width;
+  mHeight = height;
 
-    glClearColor(0,1,0,1);
-    GLuint VertexArrayID;
+  glClearColor(0,1,0,1);
+  GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 }
@@ -82,6 +82,7 @@ int initShader(const char* vertexProgram,const char* fragmentProgram){
   std::cout << "Link Shaders" << std::endl;
 
   program = glCreateProgram();
+  std::cout << "createdProgram: " << program << std::endl;
   glAttachShader(program, vertex_shader);
   glAttachShader(program, fragment_shader);
   glLinkProgram(program);
@@ -109,6 +110,17 @@ void Renderer::init3DObject(Abstract3dObject* obj){
   getError("glBindBuffer");
 
   //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  /*
+  for(int i=0;i<5;i++){
+    std::cout << vertices[i].x << std::endl;
+    std::cout << vertices[i].y << std::endl;
+    std::cout << vertices[i].z << std::endl;
+    std::cout << vertices[i].u << std::endl;
+    std::cout << vertices[i].v << std::endl;
+    std::cout << std::endl;
+  }
+  */
+  //std::cout << "size: " << size << std::endl;
   glBufferData(GL_ARRAY_BUFFER, sizeof(ModelData) * size, vertices, GL_STATIC_DRAW);
   getError("glBufferData");
 
@@ -120,6 +132,7 @@ void Renderer::init3DObject(Abstract3dObject* obj){
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,index_buffer);
   getError("glBind Index Buffer");
 
+  //std::cout << "indexSize: " << indexSize << std::endl;
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * indexSize, indices, GL_STATIC_DRAW);
   getError("glBufferData");
 
@@ -138,6 +151,8 @@ void Renderer::init3DObject(Abstract3dObject* obj){
   GLint imageHeight = image1->getHeight();
   unsigned char* image1Data = image1->getPixels();
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+  std::cout << "image Width: " << imageWidth << std::endl;
+  std::cout << "image Height: " << imageHeight << std::endl;
   glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,imageWidth,imageHeight,0,GL_RGBA,GL_UNSIGNED_BYTE,image1Data);
   getError("glTexImage2d");
 
@@ -193,8 +208,9 @@ void Renderer::render3DObject(Abstract3dObject* obj){
   
       
   ratio = width / (float) height;
-
+  getError("Vor glViewport");
   glViewport(0, 0, width, height);
+  getError("glViewport");
   glClear(GL_COLOR_BUFFER_BIT);
   getError("glClear");
 
@@ -212,15 +228,26 @@ void Renderer::render3DObject(Abstract3dObject* obj){
                         sizeof(vertices[0]), (void*) 0);
   getError("glVertexAttribPointer");
 
+  //std::cout << "indexBuffer: " << index_buffer << std::endl;
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,index_buffer);
 
-  mat4x4_identity(m);
+  //mat4x4_identity(m);
   //mat4x4_rotate_Z(m, m, (float) glfwGetTime());
-  mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 2.f, -2.f);
-  mat4x4_mul(mvp, p, m);
+  //mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 2.f, -2.f);
+  //mat4x4_mul(mvp, p, m);
 
+  //dogEngine::CMatrix4 mMat = dogEngine::CMatrix4::getIdentity();
+  dogEngine::CMatrix4 mMat = obj->getTransformationMatrix();
+  dogEngine::CMatrix4 ortho = dogEngine::CMatrix4::getOrtho(-ratio,ratio,-1.f,1.f,2.f,-2.f);
+  dogEngine::CMatrix4 mvpMat = ortho * mMat;
+  float mvpArray[16]; 
+  mvpMat.getArray(mvpArray,true);
+
+  //std::cout << "program: " << program << std::endl;
   glUseProgram(program);
-  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
+  getError("glUseProgram");
+  //glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
+  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvpArray);
   getError("glUniformMatrix4fv");
 
   
@@ -228,6 +255,7 @@ void Renderer::render3DObject(Abstract3dObject* obj){
   glActiveTexture(GL_TEXTURE0);
   getError("glActiveTexture");
   
+  //std::cout << "textureID: " << textureId << std::endl;
   glBindTexture(GL_TEXTURE_2D,textureId);
   getError("glBindTexture");
 
@@ -235,8 +263,12 @@ void Renderer::render3DObject(Abstract3dObject* obj){
   getError("glUniform1i");
 
   //glDrawArrays(GL_TRIANGLES, 0, size);
+  //std::cout << "indiceSize: " << indiceSize << std::endl;
   glDrawElements(GL_TRIANGLES, indiceSize,GL_UNSIGNED_SHORT,(void*)0);
+  getError("glDrawElements");
 
   glDisableVertexAttribArray(0);
+  getError("glDisableVertexAttribArray(0)");
   glDisableVertexAttribArray(1);
+  getError("glDisableVertexAttribArray(1)");
 }

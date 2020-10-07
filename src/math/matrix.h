@@ -113,6 +113,7 @@ namespace dogEngine
 		//CMatrix4 inverse();
 		CMatrix3 getRotationMatrix();
 		//static CMatrix4 getTranslationMatrix(CVector3 vec);
+		static CMatrix4 getOrtho(float left,float right,float bottom,float top,float znear,float zfar);
 	};
 
 
