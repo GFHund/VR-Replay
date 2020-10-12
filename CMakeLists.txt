@@ -40,10 +40,11 @@ enable_testing()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCES src/main.cpp
-    src/F1Replay.cpp
+    src/VrReplay.cpp
     src/Shader.cpp
     src/Image.cpp
     src/ImGuiRenderer.cpp
+    src/ControlPanel.cpp
     src/Exceptions/normalizeZeroVectorException.cpp
     src/renderer/Renderer.cpp
     src/renderer/RenderFont.cpp
@@ -56,6 +57,7 @@ set(SOURCES src/main.cpp
     src/vendor/imgui/imgui_draw.cpp
     src/vendor/imgui/imgui_demo.cpp
     src/vendor/imgui/imgui_widgets.cpp
+    src/vendor/imgui/ImGuiFileDialog.cpp
     )
 
 add_executable(F1Replay ${SOURCES})

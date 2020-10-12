@@ -42,6 +42,8 @@ class ImGuiRenderer{
     bool CheckShader(GLuint handle, const char* desc);
     bool CheckProgram(GLuint handle, const char* desc);
 
+    virtual void SetupWindow() = 0;
+
     public:
     void init(GLFWwindow* window);
     void render(GLFWwindow* window,int width,int height);

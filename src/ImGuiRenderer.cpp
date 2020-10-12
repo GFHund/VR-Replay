@@ -110,7 +110,7 @@ void ImGuiRenderer::imGuiRenderInit(){
     glGetIntegerv(GL_TEXTURE_BINDING_2D,&last_texture);
     glGetIntegerv(GL_ARRAY_BUFFER_BINDING,&last_array_buffer);
     const char* vertex_shader =
-        "#version 330 core"
+        "#version 330 core\n"
         "layout (location = 0) in vec2 Position;\n"
         "layout (location = 1) in vec2 UV;\n"
         "layout (location = 2) in vec4 Color;\n"
@@ -124,7 +124,7 @@ void ImGuiRenderer::imGuiRenderInit(){
         "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
         "}\n";
     const char* fragment_shader =
-        "#version 330 core"
+        "#version 330 core\n"
         "in vec2 Frag_UV;\n"
         "in vec4 Frag_Color;\n"
         "uniform sampler2D Texture;\n"
@@ -432,6 +432,7 @@ void ImGuiRenderer::UpdateMouseCursor(GLFWwindow* window){
 }
 bool ImGuiRenderer::CheckShader(GLuint handle, const char* desc)
 {
+    std::cout << "Check Shader" << std::endl;
     GLint status = 0, log_length = 0;
     glGetShaderiv(handle, GL_COMPILE_STATUS, &status);
     glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &log_length);
@@ -499,12 +500,13 @@ void ImGuiRenderer::render(GLFWwindow* window,int width,int height){
     io.DisplaySize = ImVec2((float)width, (float)height);
     ImGui::NewFrame();
     //std::cout << "Im Gui Show Demo Window" << std::endl;
-    ImGui::ShowDemoWindow(&show_demo_window);
+    //ImGui::ShowDemoWindow(&show_demo_window);
 
     static float f = 0.0f;
     static int counter = 0;
 
     //std::cout << "Im Gui Controls" << std::endl;
+    /*
     ImGui::Begin("Hello World");
     ImGui::Text("This is some useful text");
     ImGui::Checkbox("Demo Window",&show_demo_window);
@@ -519,11 +521,13 @@ void ImGuiRenderer::render(GLFWwindow* window,int width,int height){
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::End();
-
+    */
+    SetupWindow();
     //std::cout << "Im Gui Render" << std::endl;
     NewFrame(window);
     // Rendering
     ImGui::Render();
+    imGuiRender(ImGui::GetDrawData());
 }
 void ImGuiRenderer::shutdown(GLFWwindow* window){
     imGuiShutdown(window);

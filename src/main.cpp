@@ -1,6 +1,6 @@
-#include "F1Replay.h"
+#include "VrReplay.h"
 
 int main(){
-    F1Replay o = F1Replay();
+    VrReplay o = VrReplay();
     o.init();
 }
