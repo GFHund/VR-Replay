@@ -53,6 +53,8 @@ set(SOURCES src/main.cpp
     src/math/vector.cpp
     src/math/matrix.cpp
     src/math/quaternion.cpp
+    src/EventSystem/EventManager.cpp
+    src/EventSystem/EventParam.cpp
     src/vendor/imgui/imgui.cpp
     src/vendor/imgui/imgui_draw.cpp
     src/vendor/imgui/imgui_demo.cpp
