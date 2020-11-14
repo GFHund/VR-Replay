@@ -1,5 +1,6 @@
 #include "EventManager.h"
 #include <stdexcept>
+#include <iostream>
 
 EventManager* EventManager::instance = nullptr;
 
@@ -15,8 +16,9 @@ EventManager* EventManager::getInstance(){
 }
 
 void EventManager::subscribe(std::string name,AbstractEvent* event){
+    std::cout << "Subscribe " << name << std::endl;
     try{
-        std::vector<AbstractEvent*> vec = mEvents.at(name);
+        std::vector<AbstractEvent*>& vec = mEvents.at(name);
         vec.push_back(event);
     }catch(std::out_of_range e){
         std::vector<AbstractEvent*> vec;
@@ -27,10 +29,12 @@ void EventManager::subscribe(std::string name,AbstractEvent* event){
 void EventManager::fireEvent(std::string name,EventParam* param){
     try{
         std::vector<AbstractEvent*> vec = mEvents.at(name);
+        std::cout << "Fire Event: "<< name << " " << vec.size() << std::endl;
         for(auto it = vec.begin();it != vec.end();++it){
             (*it)->event(name,param);
             
         }
+        delete param;
     } catch(std::out_of_range e){
         throw e;
     }

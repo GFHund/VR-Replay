@@ -46,7 +46,7 @@ class ImGuiRenderer{
 
     public:
     void init(GLFWwindow* window);
-    void render(GLFWwindow* window,int width,int height);
+    void render(float deltaTime, GLFWwindow* window,int width,int height);
     void shutdown(GLFWwindow* window);
 };
 

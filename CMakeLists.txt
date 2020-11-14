@@ -41,15 +41,21 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCES src/main.cpp
     src/VrReplay.cpp
-    src/Shader.cpp
+    src/shader/Shader.cpp
+	src/shader/ImageShaderParam.cpp
+	src/shader/VectorShaderParam.cpp
     src/Image.cpp
     src/ImGuiRenderer.cpp
     src/ControlPanel.cpp
     src/Exceptions/normalizeZeroVectorException.cpp
+    src/Data/DataLayer.cpp
     src/renderer/Renderer.cpp
     src/renderer/RenderFont.cpp
+    src/Replay/Replay.cpp
+    src/objects/Abstract3dObject.cpp
     src/objects/Rectangle.cpp
     src/objects/Ring.cpp
+    src/objects/Cube.cpp
     src/math/vector.cpp
     src/math/matrix.cpp
     src/math/quaternion.cpp
@@ -60,6 +66,7 @@ set(SOURCES src/main.cpp
     src/vendor/imgui/imgui_demo.cpp
     src/vendor/imgui/imgui_widgets.cpp
     src/vendor/imgui/ImGuiFileDialog.cpp
+    src/vendor/sqlite/sqlite3.c
     )
 
 add_executable(F1Replay ${SOURCES})
@@ -68,6 +75,11 @@ if(MINGW)
     message("FOUND MINGW \n")
     target_link_libraries(F1Replay ws2_32 ${CMAKE_THREAD_LIBS_INIT} glfw OpenGL::GL ${FREETYPE_LIBRARIES})
 endif()
+
+configure_file(src/shader/fragment/fragmentProgram.glsl fragmentProgram.glsl COPYONLY)
+configure_file(src/shader/vertex/vertexProgram.glsl vertexProgram.glsl COPYONLY)
+configure_file(src/shader/fragment/fragmentProgramColor.glsl fragmentProgramColor.glsl COPYONLY)
+configure_file(src/shader/vertex/vertexProgramColor.glsl vertexProgramColor.glsl COPYONLY)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

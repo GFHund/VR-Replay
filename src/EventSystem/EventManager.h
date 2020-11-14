@@ -17,7 +17,7 @@ class EventManager{
     public:
     static EventManager* getInstance();
     void subscribe(std::string name,AbstractEvent* event);
-    void fireEvent(std::string name,EventParam* param);
+    void fireEvent(std::string name,EventParam* param = nullptr);
 };
 
 #endif

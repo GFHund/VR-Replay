@@ -62,5 +62,9 @@ float EventParam::getFloat(std::string name){
 }
 std::string EventParam::getString(std::string name){
     ParamValue val = mParams.at(name);
-    return std::string(val.value);
+    std::string str = std::string();
+    for(int i=0;i<val.num;i++){
+        str += val.value[i];
+    }
+    return str;
 }

@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "../linmath.h"
+#include "../shader/ImageShaderParam.h"
+#include "../shader/VectorShaderParam.h"
 
 void Renderer::init(int width,int height){
   //---------------------- GLEW Commands
@@ -100,7 +102,7 @@ void Renderer::init3DObject(Abstract3dObject* obj){
   unsigned int indexSize = 0;
   ModelData* vertices = obj->getModelData(size);
   unsigned short* indices = obj->getIndexData(indexSize);
-  Image* image1 = obj->getImage(0);
+  //Image* image1 = obj->getImage(0);
   Shader* shader = obj->getShader();
 
   glGenBuffers(1, &vertex_buffer);
@@ -138,8 +140,6 @@ void Renderer::init3DObject(Abstract3dObject* obj){
 
   obj->setIndiceBuffer(index_buffer);
 
-  
-
   unsigned int textureId = 0;
   glGenTextures(1, &textureId);
   getError("glGenTextures");
@@ -147,16 +147,38 @@ void Renderer::init3DObject(Abstract3dObject* obj){
   glBindTexture(GL_TEXTURE_2D, textureId);
   getError("glBindTexture");
   ////glTexImage2D(GL_TEXTURE_2D,0,GL_RED,640,480,0,GL_RED,GL_UNSIGNED_BYTE,image);
-  GLint imageWidth = image1->getWidth();
-  GLint imageHeight = image1->getHeight();
-  unsigned char* image1Data = image1->getPixels();
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-  std::cout << "image Width: " << imageWidth << std::endl;
-  std::cout << "image Height: " << imageHeight << std::endl;
-  glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,imageWidth,imageHeight,0,GL_RGBA,GL_UNSIGNED_BYTE,image1Data);
-  getError("glTexImage2d");
+  std::map<std::string,AbstractShaderParam*> paramMap = obj->getShaderParamMap();
+  for(auto it = paramMap.begin(); it != paramMap.end();it++){
+    if(it->second->getClass().compare("Image") == 0){
+      ImageShaderParam* shaderParam = (ImageShaderParam*)it->second;
+      Image* image1 = shaderParam->getImage();
+      GLint imageWidth = image1->getWidth();
+      GLint imageHeight = image1->getHeight();
+      unsigned char* image1Data = image1->getPixels();
+      glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+      std::cout << "image Width: " << imageWidth << std::endl;
+      std::cout << "image Height: " << imageHeight << std::endl;
+      glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,imageWidth,imageHeight,0,GL_RGBA,GL_UNSIGNED_BYTE,image1Data);
+      getError("glTexImage2d");
 
-  image1->setGlTexId(textureId);
+      image1->setGlTexId(textureId);
+    }
+  }
+  /*
+  if(image1 !=nullptr){
+    GLint imageWidth = image1->getWidth();
+    GLint imageHeight = image1->getHeight();
+    unsigned char* image1Data = image1->getPixels();
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    std::cout << "image Width: " << imageWidth << std::endl;
+    std::cout << "image Height: " << imageHeight << std::endl;
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,imageWidth,imageHeight,0,GL_RGBA,GL_UNSIGNED_BYTE,image1Data);
+    getError("glTexImage2d");
+
+    image1->setGlTexId(textureId);
+  }
+  */
+  
 
   program = initShader(shader->getVertexProgram(), shader->getFragmentProgram());
 
@@ -180,10 +202,6 @@ void Renderer::init3DObject(Abstract3dObject* obj){
   
 }
 
-void Renderer::render(){
-
-}
-
 void Renderer::render3DObject(Abstract3dObject* obj){
   float ratio;
   int width = mWidth, height = mHeight;
@@ -194,17 +212,16 @@ void Renderer::render3DObject(Abstract3dObject* obj){
   unsigned short* indices = obj->getIndexData(indiceSize);
   //std::cout << size << std::endl;
   //std::cout << vertices[0].x << std::endl;
-  Image* image1 = obj->getImage(0);
+  //Image* image1 = obj->getImage(0);
   Shader* shader = obj->getShader();
   GLuint program = shader->getGlShaderId();
   GLint mvp_location, texture_location;//vpos_location, vcol_location,vtex_location,
   GLenum glError;
   int vertex_buffer = obj->getVertexBuffer();
   int index_buffer = obj->getIndiceBuffer();
-  unsigned int textureId = image1->getGlTexId();
 
   mvp_location = glGetUniformLocation(program, "MVP");
-  texture_location = glGetUniformLocation(program, "tex");
+  //texture_location = glGetUniformLocation(program, "tex");
   
       
   ratio = width / (float) height;
@@ -238,8 +255,10 @@ void Renderer::render3DObject(Abstract3dObject* obj){
 
   //dogEngine::CMatrix4 mMat = dogEngine::CMatrix4::getIdentity();
   dogEngine::CMatrix4 mMat = obj->getTransformationMatrix();
+  dogEngine::CMatrix4 viewMat = this->mCameraRot.getMatrix() * dogEngine::CMatrix4::getTranslationMatrix(dogEngine::CVector4(this->mCameraPos));
+  viewMat = viewMat.inverse();
   dogEngine::CMatrix4 ortho = dogEngine::CMatrix4::getOrtho(-ratio,ratio,-1.f,1.f,2.f,-2.f);
-  dogEngine::CMatrix4 mvpMat = ortho * mMat;
+  dogEngine::CMatrix4 mvpMat = ortho * viewMat * mMat;
   float mvpArray[16]; 
   mvpMat.getArray(mvpArray,true);
 
@@ -254,16 +273,37 @@ void Renderer::render3DObject(Abstract3dObject* obj){
 
   glActiveTexture(GL_TEXTURE0);
   getError("glActiveTexture");
-  
-  //std::cout << "textureID: " << textureId << std::endl;
-  glBindTexture(GL_TEXTURE_2D,textureId);
-  getError("glBindTexture");
+  std::map<std::string,AbstractShaderParam*> paramMap = obj->getShaderParamMap();
 
-  glUniform1i(texture_location,0);
-  getError("glUniform1i");
+  std::cout << "Begin with paramMap" << std::endl;
+  for(auto it = paramMap.begin(); it != paramMap.end();it++){
+    if(it->second->getClass().compare("Image") == 0){
+      texture_location = glGetUniformLocation(program,it->first.c_str());
+      ImageShaderParam* imageParam = (ImageShaderParam*)it->second;
+      Image* image1 = imageParam->getImage();
+      
+      unsigned int textureId = image1->getGlTexId();
+      //std::cout << "textureID: " << textureId << std::endl;
+      glBindTexture(GL_TEXTURE_2D,textureId);
+      getError("glBindTexture");
+      glUniform1i(texture_location,0);
+      getError("glUniform1i");
+    }
+    else if(it->second->getClass().compare("Vector") == 0){
+      std::cout << "I am in" << std::endl;
+      std::cout << it->first << std::endl;
+      int varLocation = glGetUniformLocation(program,it->first.c_str());
+      VectorShaderParam* vectorParam = (VectorShaderParam*)it->second;
+      dogEngine::CVector3 vec = vectorParam->getVector();
+      std::array<float,3> vecArray = vec.getArray();
+      std::cout << vec.getX() << " " << vec.getY() << " " << vec.getZ() << std::endl;
+      //glUniform3f(varLocation,vec.getX(),vec.getY(),vec.getZ());
+      glUniform3fv(varLocation,3,vecArray.data());
+      
+    }
+  }
+  std::cout << "End with paramMap" << std::endl;
 
-  //glDrawArrays(GL_TRIANGLES, 0, size);
-  //std::cout << "indiceSize: " << indiceSize << std::endl;
   glDrawElements(GL_TRIANGLES, indiceSize,GL_UNSIGNED_SHORT,(void*)0);
   getError("glDrawElements");
 
@@ -271,4 +311,23 @@ void Renderer::render3DObject(Abstract3dObject* obj){
   getError("glDisableVertexAttribArray(0)");
   glDisableVertexAttribArray(1);
   getError("glDisableVertexAttribArray(1)");
+  std::cout << "End of function" << std::endl;
+}
+
+void Renderer::setCameraPos(dogEngine::CVector3 pos){
+  this->mCameraPos = pos;
+}
+void Renderer::setCameraRot(dogEngine::CQuaternion rot){
+  this->mCameraRot = rot;
+}
+void Renderer::setCameraToPos(dogEngine::CVector3 pos, float angleX,float angleY, float distance){
+  dogEngine::CVector3 originPos = dogEngine::CVector3(0,0,-1);
+  dogEngine::CQuaternion quad1 = dogEngine::CQuaternion(dogEngine::CVector3(1,0,0),angleX);
+  dogEngine::CQuaternion quad2 = dogEngine::CQuaternion(dogEngine::CVector3(0,1,0),angleY);
+  dogEngine::CQuaternion result = quad1 * quad2;
+  this->mCameraRot = result;
+
+  dogEngine::CVector3 dirVec = result.getMatrix().multiplyVec3(originPos);
+  dogEngine::CVector3 resultPos = pos + dirVec * (-1 * distance);
+  this->mCameraPos = resultPos;
 }

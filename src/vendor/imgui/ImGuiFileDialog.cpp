@@ -22,6 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#ifdef __STRICT_ANSI__
+#undef __STRICT_ANSI__
+#endif
+
+
 #include "ImGuiFileDialog.h"
 #include "imgui.h"
 
