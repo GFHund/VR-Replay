@@ -18,9 +18,13 @@ class EventParam{
     void setInt(std::string name,int value);
     void setFloat(std::string name,float value);
     void setString(std::string name,std::string value);
+    void setDouble(std::string name,double value);
+    void setChar(std::string name,char value);
     int getInt(std::string name);
     float getFloat(std::string name);
     std::string getString(std::string name);
+    double getDouble(std::string name);
+    char getChar(std::string name);
 };
 
 #endif

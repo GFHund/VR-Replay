@@ -63,11 +63,12 @@ void ControlPanel::SetupWindow(){
 }
 
 void ControlPanel::event(std::string eventName,EventParam* param){
-    if(eventName.compare("DataOpened") == 0){
-        mSessionType.clear();
-        mSessionType.push_back("-");
-        std::vector<const char*> sessions = DataLayer::getInstance()->getSessions();
-        mSessionType.insert(mSessionType.end(),sessions.begin(),sessions.end());
+  ImGuiRenderer::event(eventName,param);
+  if(eventName.compare("DataOpened") == 0){
+      mSessionType.clear();
+      mSessionType.push_back("-");
+      std::vector<const char*> sessions = DataLayer::getInstance()->getSessions();
+      mSessionType.insert(mSessionType.end(),sessions.begin(),sessions.end());
 
-    }
+  }
 }

@@ -5,7 +5,7 @@
 #include "EventSystem/AbstractEvent.h"
 #include <vector>
 
-class ControlPanel: public ImGuiRenderer, public AbstractEvent{
+class ControlPanel: public ImGuiRenderer{
     protected:
     std::vector<const char*> mSessionType;
     bool mPlay;

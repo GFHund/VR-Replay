@@ -1,10 +1,17 @@
 #include "ImGuiRenderer.h"
 #include <iostream>
-
+#include "EventSystem/EventManager.h"
 
 #define GLFW_HAS_NEW_CURSORS          (GLFW_VERSION_MAJOR * 1000 + GLFW_VERSION_MINOR * 100 >= 3400) // 3.4+ GLFW_RESIZE_ALL_CURSOR, GLFW_RESIZE_NESW_CURSOR, GLFW_RESIZE_NWSE_CURSOR, GLFW_NOT_ALLOWED_CURSOR
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+ImGuiRenderer::ImGuiRenderer(){
+  EventManager::getInstance()->subscribe("MouseButtonCallback",this);
+  EventManager::getInstance()->subscribe("KeyCallback",this);
+  EventManager::getInstance()->subscribe("ScrollCallback",this);
+  EventManager::getInstance()->subscribe("CharCallback",this);
+}
+
+static void key_callback(int key, int scancode, int action, int mods)
 {
     ImGuiIO& io = ImGui::GetIO();
     if(action == GLFW_PRESS){
@@ -16,17 +23,14 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
     io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
     io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
-
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
-static void MouseButtonCallback(GLFWwindow* window, int button,int action,int mods){
+static void MouseButtonCallback(int button,int action,int mods){
 
 }
-static void ScrollCallback(GLFWwindow* window, double xoffset,double yoffset){
+static void ScrollCallback(double xoffset,double yoffset){
 
 }
-static void CharCallback(GLFWwindow*, unsigned int c){
+static void CharCallback(unsigned int c){
     ImGuiIO& io = ImGui::GetIO();
     io.AddInputCharacter(c);
 }
@@ -477,12 +481,12 @@ void ImGuiRenderer::init(GLFWwindow* window){
     ImGuiIO& io = ImGui::GetIO();(void)io;
     ImGui::StyleColorsDark();
 
-    std::cout << "Set Callbacks" << std::endl;
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetMouseButtonCallback(window, MouseButtonCallback);
-    glfwSetScrollCallback(window, ScrollCallback);
+    //std::cout << "Set Callbacks" << std::endl;
+    //glfwSetKeyCallback(window, key_callback);
+    //glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    //glfwSetScrollCallback(window, ScrollCallback);
     //g_PrevUserCallbackKey = glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
-    glfwSetCharCallback(window, CharCallback);
+    //glfwSetCharCallback(window, CharCallback);
 
     std::cout << "Im Gui Init" << std::endl;
     imGuiInit(window);
@@ -511,4 +515,26 @@ void ImGuiRenderer::render(float deltaTime, GLFWwindow* window,int width,int hei
 }
 void ImGuiRenderer::shutdown(GLFWwindow* window){
     imGuiShutdown(window);
+}
+
+void ImGuiRenderer::event(std::string eventName,EventParam* param){
+  if(eventName.compare("KeyCallback") == 0){
+    int key = param->getInt("key");
+    int scancode = param->getInt("scancode");
+    int action = param->getInt("action");
+    int mods = param->getInt("mods");
+    key_callback(key,scancode,action,mods);
+  } else if(eventName.compare("MouseButtonCallback") == 0){
+    int button = param->getInt("button");
+    int action = param->getInt("action");
+    int mods = param->getInt("mods");
+    MouseButtonCallback(button,action,mods);
+  } else if(eventName.compare("ScrollCallback") == 0){
+    double xOffset = param->getDouble("xoffset");
+    double yOffset = param->getDouble("yoffset");
+    ScrollCallback(xOffset,yOffset);
+  } else if(eventName.compare("CharCallback") == 0){
+    unsigned int c =  param->getInt("c");
+    CharCallback(c);
+  }
 }

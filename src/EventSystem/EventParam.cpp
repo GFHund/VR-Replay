@@ -44,6 +44,22 @@ void EventParam::setString(std::string name,std::string value){
     }
     insertIntoMap(name,copyArray,bytes);
 }
+void EventParam::setDouble(std::string name,double value){
+  int bytes = sizeof(value);
+  char* doubleArray = (char*)&value;
+  char* copyArray = new char[bytes];
+  for(int i=0;i<bytes;i++){
+    copyArray[i] = doubleArray[i];
+  }
+  insertIntoMap(name,copyArray,bytes);
+}
+void EventParam::setChar(std::string name,char value){
+  int bytes = sizeof(value);
+  char* copy = new char;
+  *copy = value;
+  insertIntoMap(name,copy,bytes);
+}
+
 int EventParam::getInt(std::string name){
     ParamValue val = mParams.at(name);
     if(val.num != sizeof(int)){
@@ -67,4 +83,19 @@ std::string EventParam::getString(std::string name){
         str += val.value[i];
     }
     return str;
+}
+double EventParam::getDouble(std::string name){
+  ParamValue val = mParams.at(name);
+  if(val.num != sizeof(double)){
+    throw std::exception();
+  }
+  double* value = (double*)val.value;
+  return *value;
+}
+char EventParam::getChar(std::string name){
+  ParamValue val = mParams.at(name);
+  if(val.num != sizeof(char)){
+    throw std::exception();
+  }
+  return *(val.value);
 }

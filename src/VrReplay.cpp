@@ -8,6 +8,7 @@
 #include "objects/Rectangle.h"
 #include "ControlPanel.h"
 #include "Data/DataLayer.h"
+#include "EventSystem/EventManager.h"
 
 #include "Exceptions/InitFontException.h"
 #include "Exceptions/LoadingFontException.h"
@@ -22,11 +23,40 @@ static void error_callback(int error, const char* description)
 VrReplay::VrReplay(){}
 
 static void MouseButtonCallback(GLFWwindow* window, int button,int action,int mods){
-
+  EventParam* param = new EventParam();
+  param->setInt("button",button);
+  param->setInt("action",action);
+  param->setInt("mods",mods);
+  EventManager::getInstance()->fireEvent("MouseButtonCallback",param);
+}
+static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods){
+  EventParam* param = new EventParam();
+  param->setInt("key",key);
+  param->setInt("scancode",scancode);
+  param->setInt("action",action);
+  param->setInt("mods",mods);
+  EventManager::getInstance()->fireEvent("KeyCallback",param);
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
-void VrReplay::registerEvents(){
+static void ScrollCallback(GLFWwindow* window, double xoffset,double yoffset){
+  EventParam* param = new EventParam();
+  param->setDouble("xoffset",xoffset);
+  param->setDouble("yoffset",yoffset);
+  EventManager::getInstance()->fireEvent("ScrollCallback",param);
+}
+static void CharCallback(GLFWwindow*, unsigned int c){
+  EventParam* param = new EventParam();
+  param->setInt("c",c);
+  EventManager::getInstance()->fireEvent("CharCallback",param);
+}
+
+void VrReplay::registerEvents(GLFWwindow* window){
   glfwSetMouseButtonCallback(window, MouseButtonCallback);
+  glfwSetKeyCallback(window, keyCallback);
+  glfwSetScrollCallback(window, ScrollCallback);
+  glfwSetCharCallback(window, CharCallback);
 }
 
 void VrReplay::init(){
@@ -52,6 +82,8 @@ void VrReplay::init(){
     glfwMakeContextCurrent(window);
 
     DataLayer::getInstance()->init();
+    
+    registerEvents(window);
 
     ControlPanel cp;
     cp.init(window);

@@ -3,8 +3,10 @@
 
 #include "OpenGLHeaders.h"
 #include "vendor/imgui/imgui.h"
+#include "EventSystem/AbstractEvent.h"
+#include <string>
 
-class ImGuiRenderer{
+class ImGuiRenderer:public AbstractEvent{
     private:
     // Data
     enum GlfwClientApi
@@ -44,10 +46,12 @@ class ImGuiRenderer{
 
     virtual void SetupWindow() = 0;
 
-    public:
+public:
+    ImGuiRenderer();
     void init(GLFWwindow* window);
     void render(float deltaTime, GLFWwindow* window,int width,int height);
     void shutdown(GLFWwindow* window);
+    void event(std::string eventName,EventParam* param = nullptr);
 };
 
 #endif 

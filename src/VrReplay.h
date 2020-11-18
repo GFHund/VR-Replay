@@ -10,7 +10,7 @@
 class VrReplay{
     private:
         std::chrono::time_point<std::chrono::system_clock,std::chrono::duration<int,std::milli> > tp1,tp2;
-        void registerEvents();
+        void registerEvents(GLFWwindow* window);
     public:
     VrReplay();
     void init();
