@@ -105,8 +105,8 @@ CarMotionData interpolateMotionData(CarMotionData min,CarMotionData max,float mi
 
 std::vector<CarMotionData> DataLayer::getMotionDataFromeSessionTime(float sessionTime){
     if(mDb == nullptr){
-		std::cout << "getMotionDataFromeSessionTime" << std::endl;
-        throw DatabaseNotOpenException();
+      //std::cout << "getMotionDataFromeSessionTime" << std::endl;
+      throw DatabaseNotOpenException();
     }
     std::string maxPositionSql = std::string("SELECT packet, sessionTime FROM packets WHERE sessionTime > ");
     maxPositionSql += std::to_string(sessionTime);

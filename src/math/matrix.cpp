@@ -162,4 +162,29 @@ namespace dogEngine
 											0,0,0,1};
 		return CMatrix4(false,orthoMatrixArr);
 	}
+  
+  CMatrix4 CMatrix4::getPerspective(float fovy,float aspect,float zNear,float zFar){
+    const float PI = 3.14159;
+			float pi360 = PI / 360.0f;
+			float fovRad = fovy * pi360;
+			auto cot = [](float alpha){return 1 / tan(alpha); };
+			float f = cot(fovRad / 2);
+			float xx = f / aspect;
+			
+			float yy = f;
+			float zz = -((zFar + zNear)/(zFar - zNear));
+			
+			float wz = -((2 * zFar * zNear) / (zFar - zNear));
+			/*
+      float perspectiveMatrixArr[16] = {xx,0,0,0,
+											0,yy,0,0,
+											0,0,zz,wz,
+											0,0,-1,0};
+			*/
+      std::array<float,16> perspectiveMatrixArr = {xx,0,0,0,
+											0,yy,0,0,
+											0,0,zz,wz,
+											0,0,-1,0};
+			return CMatrix4(false,perspectiveMatrixArr);
+  }
 }

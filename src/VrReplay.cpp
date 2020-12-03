@@ -52,11 +52,19 @@ static void CharCallback(GLFWwindow*, unsigned int c){
   EventManager::getInstance()->fireEvent("CharCallback",param);
 }
 
+static void CursorPosCallback(GLFWwindow* window,double xPos,double yPos){
+  EventParam* param = new EventParam();
+  param->setDouble("xPos",xPos);
+  param->setDouble("yPos",yPos);
+  EventManager::getInstance()->fireEvent("CursorPosCallback",param);
+}
+
 void VrReplay::registerEvents(GLFWwindow* window){
   glfwSetMouseButtonCallback(window, MouseButtonCallback);
   glfwSetKeyCallback(window, keyCallback);
   glfwSetScrollCallback(window, ScrollCallback);
   glfwSetCharCallback(window, CharCallback);
+  glfwSetCursorPosCallback(window,CursorPosCallback);
 }
 
 void VrReplay::init(){

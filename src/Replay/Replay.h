@@ -4,6 +4,7 @@
 #include "../EventSystem/AbstractEvent.h"
 #include "../renderer/Renderer.h"
 #include "../objects/Cube.h"
+#include "../math/vector.h"
 
 
 class Replay: public AbstractEvent{
@@ -13,7 +14,11 @@ class Replay: public AbstractEvent{
     Cube* test;
     bool mPlay;
     float mMaxReplayTime;
-    
+    dogEngine::CVector3 cameraPos;
+    bool mMouseButtonPressed;
+    double mXPos,mYPos;
+    double mYRot,mXRot;
+    void handleKeyInput(int key, int scancode, int action, int mods);
     public:
     Replay();
     void init(Renderer renderer);

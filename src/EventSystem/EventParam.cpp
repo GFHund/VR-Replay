@@ -61,41 +61,66 @@ void EventParam::setChar(std::string name,char value){
 }
 
 int EventParam::getInt(std::string name){
-    ParamValue val = mParams.at(name);
-    if(val.num != sizeof(int)){
+    try{
+      ParamValue val = mParams.at(name);
+      if(val.num != sizeof(int)){
         throw std::exception();
+      }
+      int* value = (int*)val.value;
+      return *value;
+    }catch(std::out_of_range e){
+      throw e;
     }
-    int* value = (int*)val.value;
-    return *value;
 }
 float EventParam::getFloat(std::string name){
+  try{
     ParamValue val = mParams.at(name);
     if(val.num != sizeof(float)){
         throw std::exception();
     }
     float* value = (float*)val.value;
     return *value;
+    
+  }catch(std::out_of_range e){
+    throw e;
+  }
 }
 std::string EventParam::getString(std::string name){
+  try{
     ParamValue val = mParams.at(name);
     std::string str = std::string();
     for(int i=0;i<val.num;i++){
         str += val.value[i];
     }
     return str;
+    
+  }catch(std::out_of_range e){
+    throw e;
+  }
 }
 double EventParam::getDouble(std::string name){
-  ParamValue val = mParams.at(name);
-  if(val.num != sizeof(double)){
-    throw std::exception();
+  try{
+    ParamValue val = mParams.at(name);
+    if(val.num != sizeof(double)){
+      throw std::exception();
+    }
+    double* value = (double*)val.value;
+    return *value;
   }
-  double* value = (double*)val.value;
-  return *value;
+  catch(std::out_of_range e){
+    throw e;
+  }
+  
 }
 char EventParam::getChar(std::string name){
-  ParamValue val = mParams.at(name);
-  if(val.num != sizeof(char)){
-    throw std::exception();
+  try{
+    ParamValue val = mParams.at(name);
+    if(val.num != sizeof(char)){
+      throw std::exception();
+    }
+    return *(val.value);
+  }catch(std::out_of_range e){
+    throw e;
   }
-  return *(val.value);
+  
 }

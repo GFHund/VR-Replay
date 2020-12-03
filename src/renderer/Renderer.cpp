@@ -28,7 +28,6 @@ void Renderer::init(int width,int height){
 
 void getError(std::string funcName){
   GLenum glError = glGetError();
-  //std::cout << "getError"<<std::endl;
   switch(glError){
     case GL_INVALID_ENUM:
       std::cout << funcName;
@@ -63,8 +62,7 @@ int initShader(const char* vertexProgram,const char* fragmentProgram){
   std::cout << "Compile Shaders" << std::endl;
   //compile and Links programs
   vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-  //glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
-  //const char* vertexProgram = shader->getVertexProgram();
+
   glShaderSource(vertex_shader, 1, &vertexProgram, NULL);
   glCompileShader(vertex_shader);
   char shaderLog[1000];
@@ -73,8 +71,7 @@ int initShader(const char* vertexProgram,const char* fragmentProgram){
   std::cout << shaderLog << std::endl;
 
   fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-  //glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
-  //const char* fragmentProgram = shader->getFragmentProgram();
+
   glShaderSource(fragment_shader, 1, &fragmentProgram, NULL);
   glCompileShader(fragment_shader);
 
@@ -102,7 +99,7 @@ void Renderer::init3DObject(Abstract3dObject* obj){
   unsigned int indexSize = 0;
   ModelData* vertices = obj->getModelData(size);
   unsigned short* indices = obj->getIndexData(indexSize);
-  //Image* image1 = obj->getImage(0);
+
   Shader* shader = obj->getShader();
 
   glGenBuffers(1, &vertex_buffer);
@@ -111,18 +108,6 @@ void Renderer::init3DObject(Abstract3dObject* obj){
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
   getError("glBindBuffer");
 
-  //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  /*
-  for(int i=0;i<5;i++){
-    std::cout << vertices[i].x << std::endl;
-    std::cout << vertices[i].y << std::endl;
-    std::cout << vertices[i].z << std::endl;
-    std::cout << vertices[i].u << std::endl;
-    std::cout << vertices[i].v << std::endl;
-    std::cout << std::endl;
-  }
-  */
-  //std::cout << "size: " << size << std::endl;
   glBufferData(GL_ARRAY_BUFFER, sizeof(ModelData) * size, vertices, GL_STATIC_DRAW);
   getError("glBufferData");
 
@@ -134,7 +119,6 @@ void Renderer::init3DObject(Abstract3dObject* obj){
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,index_buffer);
   getError("glBind Index Buffer");
 
-  //std::cout << "indexSize: " << indexSize << std::endl;
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * indexSize, indices, GL_STATIC_DRAW);
   getError("glBufferData");
 
@@ -146,7 +130,7 @@ void Renderer::init3DObject(Abstract3dObject* obj){
 
   glBindTexture(GL_TEXTURE_2D, textureId);
   getError("glBindTexture");
-  ////glTexImage2D(GL_TEXTURE_2D,0,GL_RED,640,480,0,GL_RED,GL_UNSIGNED_BYTE,image);
+
   std::map<std::string,AbstractShaderParam*> paramMap = obj->getShaderParamMap();
   for(auto it = paramMap.begin(); it != paramMap.end();it++){
     if(it->second->getClass().compare("Image") == 0){
@@ -164,42 +148,10 @@ void Renderer::init3DObject(Abstract3dObject* obj){
       image1->setGlTexId(textureId);
     }
   }
-  /*
-  if(image1 !=nullptr){
-    GLint imageWidth = image1->getWidth();
-    GLint imageHeight = image1->getHeight();
-    unsigned char* image1Data = image1->getPixels();
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    std::cout << "image Width: " << imageWidth << std::endl;
-    std::cout << "image Height: " << imageHeight << std::endl;
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,imageWidth,imageHeight,0,GL_RGBA,GL_UNSIGNED_BYTE,image1Data);
-    getError("glTexImage2d");
-
-    image1->setGlTexId(textureId);
-  }
-  */
-  
 
   program = initShader(shader->getVertexProgram(), shader->getFragmentProgram());
 
   shader->setGlShaderId(program);
-
-
-
-  //glEnableVertexAttribArray(0);
-  
-  /*
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                        sizeof(vertices[0]), (void*) (sizeof(float) * 2));
-  glError = glGetError();
-  if(glError = GL_INVALID_ENUM){
-    std::cout << "glVertexAttribPointer No2 has invalid Enum"<< std::endl;
-  }
-  */
-  //glEnableVertexAttribArray(1);
-  
-  
 }
 
 void Renderer::render3DObject(Abstract3dObject* obj){
@@ -210,9 +162,7 @@ void Renderer::render3DObject(Abstract3dObject* obj){
   unsigned int indiceSize = 0;
   ModelData* vertices = obj->getModelData(size);
   unsigned short* indices = obj->getIndexData(indiceSize);
-  //std::cout << size << std::endl;
-  //std::cout << vertices[0].x << std::endl;
-  //Image* image1 = obj->getImage(0);
+
   Shader* shader = obj->getShader();
   GLuint program = shader->getGlShaderId();
   GLint mvp_location, texture_location;//vpos_location, vcol_location,vtex_location,
@@ -221,8 +171,6 @@ void Renderer::render3DObject(Abstract3dObject* obj){
   int index_buffer = obj->getIndiceBuffer();
 
   mvp_location = glGetUniformLocation(program, "MVP");
-  //texture_location = glGetUniformLocation(program, "tex");
-  
       
   ratio = width / (float) height;
   getError("Vor glViewport");
@@ -233,49 +181,37 @@ void Renderer::render3DObject(Abstract3dObject* obj){
 
   glEnableVertexAttribArray(1);
   getError("glEnableVertexAttribArray");
-  //glBindBuffer(GL_ARRAY_BUFFER,vertex_buffer);
   getError("glBindBuffer");
   glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,
                         sizeof(vertices[0]),(void*)(sizeof(float) * 3));
   getError("glVertexAttribPointer");
   
   glEnableVertexAttribArray(0);
-  //glBindBuffer(GL_ARRAY_BUFFER,vertex_buffer);
   glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE,
                         sizeof(vertices[0]), (void*) 0);
   getError("glVertexAttribPointer");
 
-  //std::cout << "indexBuffer: " << index_buffer << std::endl;
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,index_buffer);
 
-  //mat4x4_identity(m);
-  //mat4x4_rotate_Z(m, m, (float) glfwGetTime());
-  //mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 2.f, -2.f);
-  //mat4x4_mul(mvp, p, m);
-
-  //dogEngine::CMatrix4 mMat = dogEngine::CMatrix4::getIdentity();
   dogEngine::CMatrix4 mMat = obj->getTransformationMatrix();
   dogEngine::CMatrix4 viewMat = this->mCameraRot.getMatrix() * dogEngine::CMatrix4::getTranslationMatrix(dogEngine::CVector4(this->mCameraPos));
   viewMat = viewMat.inverse();
-  dogEngine::CMatrix4 ortho = dogEngine::CMatrix4::getOrtho(-ratio,ratio,-1.f,1.f,2.f,-2.f);
-  dogEngine::CMatrix4 mvpMat = ortho * viewMat * mMat;
+
+  dogEngine::CMatrix4 perspectiv = dogEngine::CMatrix4::getPerspective(60,ratio,0.1f,2000.0f);
+
+  dogEngine::CMatrix4 mvpMat = perspectiv * viewMat * mMat;
   float mvpArray[16]; 
   mvpMat.getArray(mvpArray,true);
 
-  //std::cout << "program: " << program << std::endl;
   glUseProgram(program);
   getError("glUseProgram");
-  //glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
   glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvpArray);
   getError("glUniformMatrix4fv");
-
-  
 
   glActiveTexture(GL_TEXTURE0);
   getError("glActiveTexture");
   std::map<std::string,AbstractShaderParam*> paramMap = obj->getShaderParamMap();
 
-  std::cout << "Begin with paramMap" << std::endl;
   for(auto it = paramMap.begin(); it != paramMap.end();it++){
     if(it->second->getClass().compare("Image") == 0){
       texture_location = glGetUniformLocation(program,it->first.c_str());
@@ -283,26 +219,23 @@ void Renderer::render3DObject(Abstract3dObject* obj){
       Image* image1 = imageParam->getImage();
       
       unsigned int textureId = image1->getGlTexId();
-      //std::cout << "textureID: " << textureId << std::endl;
+
       glBindTexture(GL_TEXTURE_2D,textureId);
       getError("glBindTexture");
       glUniform1i(texture_location,0);
       getError("glUniform1i");
     }
     else if(it->second->getClass().compare("Vector") == 0){
-      std::cout << "I am in" << std::endl;
-      std::cout << it->first << std::endl;
+
       int varLocation = glGetUniformLocation(program,it->first.c_str());
       VectorShaderParam* vectorParam = (VectorShaderParam*)it->second;
       dogEngine::CVector3 vec = vectorParam->getVector();
       std::array<float,3> vecArray = vec.getArray();
-      std::cout << vec.getX() << " " << vec.getY() << " " << vec.getZ() << std::endl;
-      //glUniform3f(varLocation,vec.getX(),vec.getY(),vec.getZ());
+
       glUniform3fv(varLocation,3,vecArray.data());
       
     }
   }
-  std::cout << "End with paramMap" << std::endl;
 
   glDrawElements(GL_TRIANGLES, indiceSize,GL_UNSIGNED_SHORT,(void*)0);
   getError("glDrawElements");
@@ -311,7 +244,6 @@ void Renderer::render3DObject(Abstract3dObject* obj){
   getError("glDisableVertexAttribArray(0)");
   glDisableVertexAttribArray(1);
   getError("glDisableVertexAttribArray(1)");
-  std::cout << "End of function" << std::endl;
 }
 
 void Renderer::setCameraPos(dogEngine::CVector3 pos){
